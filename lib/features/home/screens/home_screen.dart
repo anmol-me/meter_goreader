@@ -3,8 +3,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:intl/intl.dart';
+
+import '../../../shared/components/custom_dropdown_button.dart';
 
 final selectedGraphDateProvider = StateProvider<String?>((ref) => null);
 
@@ -21,6 +22,14 @@ class HomeScreen extends ConsumerWidget {
     DateTime selectedDate = DateTime(selectedYear, selectedMonth);
     String formattedDate = dateFormat.format(selectedDate);
 
+    void onChanged(value) {
+      final keyValueText = dateKeyValues[value];
+
+      ref
+          .read(selectedGraphDateProvider.notifier)
+          .update((state) => keyValueText!);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -28,57 +37,9 @@ class HomeScreen extends ConsumerWidget {
           style: TextStyle(color: Colors.blueGrey.shade900),
         ),
         actions: [
-          SizedBox(
-            width: 150,
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton2(
-                customButton: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.date_range),
-                      const SizedBox(width: 10),
-                      Text(selectedGraphDate ?? 'This Month'),
-                    ],
-                  ),
-                ),
-                dropdownStyleData: DropdownStyleData(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(2),
-                    boxShadow: const [
-                      BoxShadow(
-                        blurRadius: 7,
-                        spreadRadius: 7,
-                        color: Colors.black12,
-                      ),
-                    ],
-                  ),
-                ),
-                isExpanded: true,
-                iconStyleData: const IconStyleData(
-                  icon: SizedBox.shrink(),
-                ),
-                buttonStyleData: ButtonStyleData(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1,
-                    ),
-                  ),
-                ),
-                items: items,
-                onChanged: (value) {
-                  final keyValueText = dateKeyValues[value];
-
-                  ref
-                      .read(selectedGraphDateProvider.notifier)
-                      .update((state) => keyValueText!);
-                },
-              ),
-            ),
+          CustomDropdownButton(
+            selectedGraphDate: selectedGraphDate,
+            onChanged: onChanged,
           ),
         ],
       ),
@@ -252,21 +213,3 @@ List<BarChartGroupData> get barGroups {
           ))
       .toList();
 }
-
-final dateKeyValues = {
-  'item1': 'This Week',
-  'item2': 'Last Week',
-  'item3': 'This Month',
-  'item4': 'Last Month',
-  'item5': 'This Year',
-  'item6': 'Custom',
-};
-
-List<DropdownMenuItem<String>> items = dateKeyValues.entries
-    .map(
-      (entry) => DropdownMenuItem(
-        value: entry.key,
-        child: Text(entry.value),
-      ),
-    )
-    .toList();
