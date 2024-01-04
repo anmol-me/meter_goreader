@@ -2,16 +2,82 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:intl/intl.dart';
 
-class HomeScreen extends StatelessWidget {
+final selectedGraphDateProvider = StateProvider<String?>((ref) => null);
+
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedGraphDate = ref.watch(selectedGraphDateProvider);
+
+    final dateFormat = DateFormat('MMMM yyyy');
+    int selectedMonth = 1;
+    int selectedYear = 2024;
+    DateTime selectedDate = DateTime(selectedYear, selectedMonth);
+    String formattedDate = dateFormat.format(selectedDate);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
-        actions: [],
+        actions: [
+          SizedBox(
+            width: 150,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton2(
+                customButton: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.date_range),
+                      const SizedBox(width: 10),
+                      Text(selectedGraphDate ?? 'This Month'),
+                    ],
+                  ),
+                ),
+                dropdownStyleData: DropdownStyleData(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(2),
+                    boxShadow: const [
+                      BoxShadow(
+                        blurRadius: 7,
+                        spreadRadius: 7,
+                        color: Colors.black12,
+                      ),
+                    ],
+                  ),
+                ),
+                isExpanded: true,
+                iconStyleData: const IconStyleData(
+                  icon: SizedBox.shrink(),
+                ),
+                buttonStyleData: ButtonStyleData(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                items: items,
+                onChanged: (value) {
+                  final keyValueText = dateKeyValues[value];
+
+                  ref
+                      .read(selectedGraphDateProvider.notifier)
+                      .update((state) => keyValueText!);
+                },
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -25,12 +91,17 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    margin:
-                        const EdgeInsets.only(left: 10, top: 10, bottom: 10),
-                    child: const Text(
-                      'January 2024',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                    margin: const EdgeInsets.only(
+                      left: 10,
+                      top: 10,
+                      bottom: 10,
+                    ),
+                    child: Text(
+                      formattedDate,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -46,7 +117,7 @@ class HomeScreen extends StatelessWidget {
                         barGroups: barGroups,
                         gridData: const FlGridData(show: false),
                         alignment: BarChartAlignment.spaceAround,
-                        maxY: 20,
+                        maxY: 55,
                       ),
                     ),
                   ),
@@ -86,64 +157,40 @@ BarTouchData get barTouchData => BarTouchData(
 Widget getXTitles(double val, TitleMeta meta) {
   final value = val.toInt() + 1;
 
-  const style = TextStyle(
-    color: Colors.black,
-    fontSize: 10,
-  );
-
-  String text;
-
-  // Set the text value directly based on the current value (day index)
-  text = value < 1 ? '' : value.toString();
-
   return SideTitleWidget(
     axisSide: meta.axisSide,
     space: 10,
-    child: Text(text, style: style),
+    child: Text(
+      value < 1 ? '' : value.toString(),
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 10,
+      ),
+    ),
   );
 }
 
 Widget getYTitles(double val, TitleMeta meta) {
   final value = val.toInt();
-  const style = TextStyle(
-    color: Colors.black,
-    fontWeight: FontWeight.bold,
-    fontSize: 14,
-  );
-
   String text;
 
-  switch (value) {
-    case 0:
-      text = '0';
-      break;
-    case 5:
-      text = '5';
-      break;
-    case 10:
-      text = '10';
-      break;
-    case 15:
-      text = '15';
-      break;
-    case 20:
-      text = '20';
-      break;
-    // case 5:
-    //   text = '5';
-    //   break;
-    // case 6:
-    //   text = '6';
-    //   break;
-    default:
-      text = '0';
-      break;
+  if (value % 5 == 0) {
+    text = value.toString();
+  } else {
+    text = '';
   }
 
   return SideTitleWidget(
     axisSide: meta.axisSide,
     space: 12,
-    child: Text(text, style: style),
+    child: Text(
+      text,
+      style: const TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.bold,
+        fontSize: 14,
+      ),
+    ),
   );
 }
 
@@ -194,7 +241,7 @@ List<BarChartGroupData> get barGroups {
             x: e,
             barRods: [
               BarChartRodData(
-                toY: Random().nextInt(18).toDouble(),
+                toY: Random().nextInt(55).toDouble(),
                 color: Colors.green,
               )
             ],
@@ -202,3 +249,21 @@ List<BarChartGroupData> get barGroups {
           ))
       .toList();
 }
+
+final dateKeyValues = {
+  'item1': 'This Week',
+  'item2': 'Last Week',
+  'item3': 'This Month',
+  'item4': 'Last Month',
+  'item5': 'This Year',
+  'item6': 'Custom',
+};
+
+List<DropdownMenuItem<String>> items = dateKeyValues.entries
+    .map(
+      (entry) => DropdownMenuItem(
+        value: entry.key,
+        child: Text(entry.value),
+      ),
+    )
+    .toList();
