@@ -23,7 +23,10 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: Text(
+          'Home',
+          style: TextStyle(color: Colors.blueGrey.shade900),
+        ),
         actions: [
           SizedBox(
             width: 150,
