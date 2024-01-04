@@ -12,8 +12,8 @@ class TextBlock extends StatelessWidget {
   });
 
   final String onDate;
-  final String? morningReading;
-  final String? eveningReading;
+  final int morningReading;
+  final int eveningReading;
   final String date;
   final String morningTime;
   final String eveningTime;
@@ -68,7 +68,7 @@ class TextBar extends StatelessWidget {
   });
 
   final String dayTime;
-  final String? reading;
+  final int reading;
   final String date;
   final String time;
 
@@ -124,17 +124,19 @@ class HeadingTextBar extends StatelessWidget {
   });
 
   final String dayTime;
-  final String? reading;
+  final int reading;
 
   @override
   Widget build(BuildContext context) {
+    String readingText = reading.toString();
     TextStyle textStyle = TextStyle(
       fontWeight: FontWeight.bold,
       color: Colors.blueGrey.shade800,
       fontSize: 16,
     );
 
-    if (reading == null) {
+    if (reading == 0) {
+      readingText = 'Pending';
       textStyle = const TextStyle(
         fontWeight: FontWeight.bold,
         color: Colors.red,
@@ -153,7 +155,7 @@ class HeadingTextBar extends StatelessWidget {
           ),
         ),
         Text(
-          reading ?? 'Pending',
+          readingText,
           style: textStyle,
         ),
       ],

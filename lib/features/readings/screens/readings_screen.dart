@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:intl/intl.dart';
 
 import '../../../shared/components/app_search_bar.dart';
 import '../components/text_bar_widgets.dart';
@@ -45,7 +46,7 @@ class ReadingsScreen extends HookConsumerWidget {
                           onDate: e.onDate,
                           morningReading: e.morningReading,
                           eveningReading: e.eveningReading,
-                          date: e.date,
+                          date: DateFormat('dd-MM-yyyy').format(e.date),
                           morningTime: e.morningTime,
                           eveningTime: e.eveningTime,
                         ))

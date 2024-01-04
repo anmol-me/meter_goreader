@@ -1,8 +1,8 @@
 class Reading {
   final String onDate;
-  final String? morningReading;
-  final String? eveningReading;
-  final String date;
+  final int morningReading;
+  final int eveningReading;
+  final DateTime date;
   final String morningTime;
   final String eveningTime;
 

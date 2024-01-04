@@ -1,13 +1,27 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:meter_reader/features/readings/providers/providers.dart';
 
 import '../../../shared/components/custom_dropdown_button.dart';
 
 final selectedGraphDateProvider = StateProvider<String?>((ref) => null);
+
+final unitsConsumedByDateProvider = StateProvider((ref) {
+  final readings = ref.watch(readingsProvider);
+
+  final Map<DateTime, int> unitsConsumedByDate = {};
+
+  for (final reading in readings) {
+    final consumed = reading.eveningReading - reading.morningReading;
+    if (consumed >= 0) {
+      unitsConsumedByDate[reading.date] = consumed;
+    }
+  }
+
+  return unitsConsumedByDate;
+});
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -15,6 +29,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedGraphDate = ref.watch(selectedGraphDateProvider);
+    final unitsConsumedByDate = ref.watch(unitsConsumedByDateProvider);
 
     final dateFormat = DateFormat('MMMM yyyy');
     int selectedMonth = 1;
@@ -78,7 +93,7 @@ class HomeScreen extends ConsumerWidget {
                         barTouchData: barTouchData,
                         titlesData: titlesData,
                         borderData: borderData,
-                        barGroups: barGroups,
+                        barGroups: barGroups(unitsConsumedByDate),
                         gridData: const FlGridData(show: false),
                         alignment: BarChartAlignment.spaceAround,
                         maxY: 55,
@@ -187,29 +202,31 @@ FlBorderData get borderData => FlBorderData(
       show: false,
     );
 
-List<BarChartGroupData> get barGroups {
-  List listOfDays = [];
-
+List<BarChartGroupData> barGroups(Map<DateTime, int> unitsConsumed) {
   const year = 2024;
-  const month = 1; // January
+  const month = 1;
 
   final desiredDate = DateTime(year, month + 1, 0);
   final numberOfDays = desiredDate.day;
 
-  for (int i = 0; i < numberOfDays; i++) {
-    listOfDays.add(i);
-  }
+  final days = List.generate(
+    numberOfDays,
+    (index) => index + 1,
+  );
 
-  return listOfDays
-      .map((e) => BarChartGroupData(
-            x: e,
-            barRods: [
-              BarChartRodData(
-                toY: Random().nextInt(55).toDouble(),
-                color: Colors.green,
-              )
-            ],
-            showingTooltipIndicators: [0],
-          ))
-      .toList();
+  return days.map((day) {
+    final date = DateTime(year, month, day);
+    final consumedUnits = unitsConsumed[date] ?? 0;
+
+    return BarChartGroupData(
+      x: day - 1,
+      barRods: [
+        BarChartRodData(
+          toY: consumedUnits.toDouble(),
+          color: Colors.green,
+        )
+      ],
+      showingTooltipIndicators: [0],
+    );
+  }).toList();
 }
