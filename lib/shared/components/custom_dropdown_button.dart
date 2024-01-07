@@ -62,20 +62,33 @@ class CustomDropdownButton extends StatelessWidget {
   }
 }
 
+enum ShowDate {
+  thisWeek('This Week'),
+  lastWeek('Last Week'),
+  thisMonth('This Month'),
+  lastMonth('Last Month'),
+  thisYear('This Year'),
+  custom('Custom');
+
+  const ShowDate(this.value);
+
+  final String value;
+}
+
 final dateKeyValues = {
-  'item1': 'This Week',
-  'item2': 'Last Week',
-  'item3': 'This Month',
-  'item4': 'Last Month',
-  'item5': 'This Year',
-  'item6': 'Custom',
+  'item1': ShowDate.thisWeek,
+  'item2': ShowDate.lastWeek,
+  'item3': ShowDate.thisMonth,
+  'item4': ShowDate.lastMonth,
+  'item5': ShowDate.thisYear,
+  'item6': ShowDate.custom,
 };
 
 List<DropdownMenuItem<String>> items = dateKeyValues.entries
     .map(
       (entry) => DropdownMenuItem(
         value: entry.key,
-        child: Text(entry.value),
+        child: Text(entry.value.value),
       ),
     )
     .toList();

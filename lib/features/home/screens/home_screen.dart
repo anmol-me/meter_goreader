@@ -2,11 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:meter_reader/features/readings/providers/providers.dart';
+import 'package:jiffy/jiffy.dart';
 
+import 'package:meter_reader/features/readings/providers/providers.dart';
 import '../../../shared/components/custom_dropdown_button.dart';
 
-final selectedGraphDateProvider = StateProvider<String?>((ref) => null);
+/// Providers
+final dropdownDateProvider = StateProvider<ShowDate?>((ref) => null);
+
+final dateFormatProvider = StateProvider<DateFormat>(
+  (ref) => DateFormat('MMMM yyyy'),
+);
+
+final dateTimeProvider = StateProvider<({DateTime? start, DateTime end})>(
+  (ref) => (start: DateTime.now(), end: DateTime.now()),
+);
+
+final formattedDateProvider =
+    StateProvider<({String? start, String end})>((ref) {
+  final formatter = ref.watch(dateFormatProvider);
+  final dateTime = ref.watch(dateTimeProvider);
+
+  final formattedDateStart = formatter.format(dateTime.start ?? DateTime.now());
+  final formattedDateEnd = formatter.format(dateTime.end);
+  return (start: formattedDateStart, end: formattedDateEnd);
+});
+
+final showDateTextProvider = Provider((ref) {
+  final dropdownDate = ref.watch(dropdownDateProvider);
+  final formattedDate = ref.watch(formattedDateProvider);
+
+  String display = formattedDate.end;
+  if (dropdownDate == ShowDate.thisWeek) {
+    display = 'Week ${formattedDate.start} - ${formattedDate.end}';
+  } else if (dropdownDate == ShowDate.lastWeek) {
+    display = 'Week ${formattedDate.start} - ${formattedDate.end}';
+  } else if (dropdownDate == ShowDate.thisYear) {
+    display = 'Year ${formattedDate.end}';
+  } else if (dropdownDate == ShowDate.custom) {
+    display = '${formattedDate.start}';
+  } else {
+    display = formattedDate.end;
+  }
+  return display;
+});
 
 final unitsConsumedByDateProvider = StateProvider((ref) {
   final readings = ref.watch(readingsProvider);
@@ -23,26 +62,68 @@ final unitsConsumedByDateProvider = StateProvider((ref) {
   return unitsConsumedByDate;
 });
 
+///
+
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedGraphDate = ref.watch(selectedGraphDateProvider);
+    final selectedChartDate = ref.watch(dropdownDateProvider);
     final unitsConsumedByDate = ref.watch(unitsConsumedByDateProvider);
 
-    final dateFormat = DateFormat('MMMM yyyy');
-    int selectedMonth = 1;
-    int selectedYear = 2024;
-    DateTime selectedDate = DateTime(selectedYear, selectedMonth);
-    String formattedDate = dateFormat.format(selectedDate);
+    final showDateText = ref.watch(showDateTextProvider);
 
-    void onChanged(value) {
-      final keyValueText = dateKeyValues[value];
+    final dateTimeNotifier = ref.read(dateTimeProvider.notifier);
+    final dateFormatNotifier = ref.read(dateFormatProvider.notifier);
 
-      ref
-          .read(selectedGraphDateProvider.notifier)
-          .update((state) => keyValueText!);
+    void onChanged(String? key) {
+      // Change title date for dropdown
+      final ShowDate? value = dateKeyValues[key];
+
+      ref.read(dropdownDateProvider.notifier).update((state) => value!);
+
+      // Change title date for chart
+      if (value == ShowDate.thisWeek) {
+        dateFormatNotifier.update((state) => DateFormat('dd/MM/yyyy'));
+        dateTimeNotifier.update(
+          (state) => (
+            start: Jiffy.now().subtract(weeks: 1).add(days: 1).dateTime,
+            end: Jiffy.now().dateTime,
+          ),
+        );
+      } else if (value == ShowDate.lastWeek) {
+        dateFormatNotifier.update((state) => DateFormat('dd/MM/yyyy'));
+        dateTimeNotifier.update(
+          (state) => (
+            start: Jiffy.now().subtract(weeks: 2).add(days: 1).dateTime,
+            end: Jiffy.now().subtract(weeks: 1).dateTime,
+          ),
+        );
+      } else if (value == ShowDate.thisMonth) {
+        dateFormatNotifier.update((state) => DateFormat('MMMM yyyy'));
+        dateTimeNotifier.update((state) => (start: null, end: DateTime.now()));
+      } else if (value == ShowDate.lastMonth) {
+        dateFormatNotifier.update((state) => DateFormat('MMMM yyyy'));
+        dateTimeNotifier.update(
+          (state) =>
+              (start: null, end: Jiffy.now().subtract(months: 1).dateTime),
+        );
+      } else if (value == ShowDate.thisYear) {
+        dateFormatNotifier.update((state) => DateFormat('yyyy'));
+        dateTimeNotifier.update(
+          (state) => (start: null, end: Jiffy.now().dateTime),
+        );
+      } else if (value == ShowDate.custom) {
+        dateFormatNotifier.update((state) => DateFormat('MMMM'));
+        dateTimeNotifier.update((state) => (
+              start: Jiffy.now().subtract(months: 1).dateTime,
+              end: Jiffy.now().dateTime,
+            ));
+      } else {
+        dateFormatNotifier.update((state) => DateFormat('MMMM yyyy'));
+        dateTimeNotifier.update((state) => (start: null, end: DateTime.now()));
+      }
     }
 
     return Scaffold(
@@ -53,7 +134,7 @@ class HomeScreen extends ConsumerWidget {
         ),
         actions: [
           CustomDropdownButton(
-            selectedGraphDate: selectedGraphDate,
+            selectedGraphDate: selectedChartDate?.value,
             onChanged: onChanged,
           ),
         ],
@@ -76,7 +157,7 @@ class HomeScreen extends ConsumerWidget {
                       bottom: 10,
                     ),
                     child: Text(
-                      formattedDate,
+                      showDateText,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 20,
@@ -93,7 +174,7 @@ class HomeScreen extends ConsumerWidget {
                         barTouchData: barTouchData,
                         titlesData: titlesData,
                         borderData: borderData,
-                        barGroups: barGroups(unitsConsumedByDate),
+                        barGroups: barGroups(unitsConsumedByDate, ref),
                         gridData: const FlGridData(show: false),
                         alignment: BarChartAlignment.spaceAround,
                         maxY: 55,
@@ -202,11 +283,16 @@ FlBorderData get borderData => FlBorderData(
       show: false,
     );
 
-List<BarChartGroupData> barGroups(Map<DateTime, int> unitsConsumed) {
+List<BarChartGroupData> barGroups(
+  Map<DateTime, int> unitsConsumed,
+  WidgetRef ref,
+) {
   const year = 2024;
   const month = 1;
 
   final desiredDate = DateTime(year, month + 1, 0);
+  // final desiredDate = ref.read(dateTimeProvider);
+
   final numberOfDays = desiredDate.day;
 
   final days = List.generate(
