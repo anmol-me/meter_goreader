@@ -25,7 +25,7 @@ class HomeScreen extends ConsumerWidget {
           CustomDropdownButton(
             selectedGraphDate: selectedChartDate?.value,
             onChanged: (key) =>
-                ref.read(onChangeProvider.notifier).onChanged(key),
+                ref.read(onChangeProvider.notifier).onChanged(key, context),
           ),
         ],
       ),

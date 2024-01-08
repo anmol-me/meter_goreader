@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../../shared/components/custom_dropdown_button.dart';
 import '../../readings/providers/providers.dart';
 
+final showErrorProvider = StateProvider.autoDispose((ref) => false);
+
 final dropdownDateProvider = StateProvider<ShowDate?>((ref) => null);
 
 final dateFormatProvider = StateProvider<DateFormat>(
@@ -11,6 +13,10 @@ final dateFormatProvider = StateProvider<DateFormat>(
 );
 
 final dateTimeProvider = StateProvider<({DateTime? start, DateTime end})>(
+  (ref) => (start: DateTime.now(), end: DateTime.now()),
+);
+
+final customMonthProvider = StateProvider<({DateTime? start, DateTime end})>(
   (ref) => (start: DateTime.now(), end: DateTime.now()),
 );
 
@@ -54,6 +60,5 @@ final unitsConsumedByDateProvider = StateProvider((ref) {
       unitsConsumedByDate[reading.date] = consumed;
     }
   }
-
   return unitsConsumedByDate;
 });
