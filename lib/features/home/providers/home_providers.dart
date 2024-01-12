@@ -1,12 +1,13 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../shared/components/custom_dropdown_button.dart';
+import '../../../shared/enums/enums.dart';
 import '../../readings/providers/providers.dart';
 
 final showErrorProvider = StateProvider.autoDispose((ref) => false);
 
-final dropdownDateProvider = StateProvider<ShowDate?>((ref) => null);
+final dropdownDateProvider =
+    StateProvider<DropdownDate?>((ref) => DropdownDate.thisMonth);
 
 final dateFormatProvider = StateProvider<DateFormat>(
   (ref) => DateFormat('MMMM yyyy'),
@@ -21,32 +22,60 @@ final customMonthProvider = StateProvider<({DateTime? start, DateTime end})>(
 );
 
 final formattedDateProvider =
-    StateProvider<({String? start, String end})>((ref) {
+    StateProvider<({String? startDate, String endDate})>((ref) {
   final formatter = ref.watch(dateFormatProvider);
   final dateTime = ref.watch(dateTimeProvider);
 
   final formattedDateStart = formatter.format(dateTime.start ?? DateTime.now());
   final formattedDateEnd = formatter.format(dateTime.end);
-  return (start: formattedDateStart, end: formattedDateEnd);
+  return (startDate: formattedDateStart, endDate: formattedDateEnd);
 });
 
-final showDateTextProvider = Provider((ref) {
-  final dropdownDate = ref.watch(dropdownDateProvider);
+final dateTextProvider = Provider<({String? startDate, String endDate})>((ref) {
+  final chartType = ref.watch(chartTypeProvider);
   final formattedDate = ref.watch(formattedDateProvider);
 
-  String display = formattedDate.end;
-  if (dropdownDate == ShowDate.thisWeek) {
-    display = 'Week ${formattedDate.start} - ${formattedDate.end}';
-  } else if (dropdownDate == ShowDate.lastWeek) {
-    display = 'Week ${formattedDate.start} - ${formattedDate.end}';
-  } else if (dropdownDate == ShowDate.thisYear) {
-    display = 'Year ${formattedDate.end}';
-  } else if (dropdownDate == ShowDate.custom) {
-    display = '${formattedDate.start}';
-  } else {
-    display = formattedDate.end;
+  ({String? startDate, String endDate}) display = (
+    startDate: formattedDate.startDate,
+    endDate: formattedDate.endDate,
+  );
+
+  if (chartType == ChartType.isWeek) {
+    display = (
+      startDate: null,
+      endDate: 'Week ${formattedDate.startDate} - ${formattedDate.endDate}',
+    );
+  } else if (chartType == ChartType.isYear) {
+    display = (
+      startDate: null,
+      endDate: 'Year ${formattedDate.endDate}',
+    );
+  } else if (chartType == ChartType.isMonth) {
+    display = (
+      startDate: '${formattedDate.startDate}',
+      endDate: (formattedDate.endDate),
+    );
   }
   return display;
+});
+
+final chartTypeProvider = StateProvider((ref) {
+  final dropdownValue = ref.watch(dropdownDateProvider);
+
+  ChartType chartType = ChartType.isMonth;
+
+  if (dropdownValue == DropdownDate.thisYear) {
+    chartType = ChartType.isYear;
+  } else if (dropdownValue == DropdownDate.thisMonth ||
+      dropdownValue == DropdownDate.lastMonth ||
+      dropdownValue == DropdownDate.custom) {
+    chartType = ChartType.isMonth;
+  } else if (dropdownValue == DropdownDate.thisWeek ||
+      dropdownValue == DropdownDate.lastWeek) {
+    chartType = ChartType.isWeek;
+  }
+
+  return chartType;
 });
 
 final unitsConsumedByDateProvider = StateProvider((ref) {

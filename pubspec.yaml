@@ -20,7 +20,7 @@ dependencies:
   dropdown_button2: ^2.3.9
   intl: ^0.18.0
   jiffy: ^6.2.1
-  syncfusion_flutter_datepicker: ^24.1.44
+  syncfusion_flutter_datepicker: ^24.1.45
 
 dev_dependencies:
   flutter_test:

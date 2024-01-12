@@ -25,7 +25,7 @@ class CustomMonthSelector extends ConsumerWidget {
               rangeSelectionColor: Colors.transparent,
               allowViewNavigation: false,
               onSelectionChanged: (args) =>
-                  ref.read(onChangeProvider.notifier).onSelectionChanged(args),
+                  ref.read(onChangeProvider.notifier).onPickerSelectionChanged(args),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -36,7 +36,7 @@ class CustomMonthSelector extends ConsumerWidget {
                 ),
                 TextButton(
                   onPressed: () =>
-                      ref.read(onChangeProvider.notifier).onOkPressed(
+                      ref.read(onChangeProvider.notifier).onCalendarOkPressed(
                             context,
                           ),
                   child: const Text('OK'),

@@ -4,9 +4,15 @@ import 'package:jiffy/jiffy.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-import '../../../shared/components/custom_dropdown_button.dart';
+import '../../../shared/components/components.dart';
+import '../../../shared/enums/enums.dart';
 import '../components/custom_month_selector.dart';
 import 'providers.dart';
+
+/// [OnChangeNotifier] exposes methods to change providers for dateTime and dateFormat
+/// [DisplayChartsNotifier] holds the list to show BaseChartViewers for chart viewing
+/// ChartViewers use methods in [ChartNotifier]
+/// [ChartNotifier] use widgets in [chart_widgets]
 
 final onChangeProvider = NotifierProvider<OnChangeNotifier, Null>(
   () => OnChangeNotifier(),
@@ -18,17 +24,17 @@ class OnChangeNotifier extends Notifier<Null> {
     return null;
   }
 
-  void onChanged(String? key, BuildContext context) {
+  void onDropdownChanged(String? key, BuildContext context) {
     final dateTimeNotifier = ref.read(dateTimeProvider.notifier);
     final dateFormatNotifier = ref.read(dateFormatProvider.notifier);
 
-    // Change title date for dropdown
-    final ShowDate? value = dateKeyValues[key];
+    /// Change title date for dropdown
+    final DropdownDate? value = dateKeyValues[key];
 
     ref.read(dropdownDateProvider.notifier).update((state) => value!);
 
-    // Change title date for chart
-    if (value == ShowDate.thisWeek) {
+    /// Change title date for chart
+    if (value == DropdownDate.thisWeek) {
       dateFormatNotifier.update((state) => DateFormat('dd/MM/yyyy'));
       dateTimeNotifier.update(
         (state) => (
@@ -36,7 +42,7 @@ class OnChangeNotifier extends Notifier<Null> {
           end: Jiffy.now().dateTime,
         ),
       );
-    } else if (value == ShowDate.lastWeek) {
+    } else if (value == DropdownDate.lastWeek) {
       dateFormatNotifier.update((state) => DateFormat('dd/MM/yyyy'));
       dateTimeNotifier.update(
         (state) => (
@@ -44,20 +50,20 @@ class OnChangeNotifier extends Notifier<Null> {
           end: Jiffy.now().subtract(weeks: 1).dateTime,
         ),
       );
-    } else if (value == ShowDate.thisMonth) {
+    } else if (value == DropdownDate.thisMonth) {
       dateFormatNotifier.update((state) => DateFormat('MMMM yyyy'));
       dateTimeNotifier.update((state) => (start: null, end: DateTime.now()));
-    } else if (value == ShowDate.lastMonth) {
+    } else if (value == DropdownDate.lastMonth) {
       dateFormatNotifier.update((state) => DateFormat('MMMM yyyy'));
       dateTimeNotifier.update(
         (state) => (start: null, end: Jiffy.now().subtract(months: 1).dateTime),
       );
-    } else if (value == ShowDate.thisYear) {
+    } else if (value == DropdownDate.thisYear) {
       dateFormatNotifier.update((state) => DateFormat('yyyy'));
       dateTimeNotifier.update(
         (state) => (start: null, end: Jiffy.now().dateTime),
       );
-    } else if (value == ShowDate.custom) {
+    } else if (value == DropdownDate.custom) {
       showDialog(
         context: context,
         builder: (context) {
@@ -70,7 +76,7 @@ class OnChangeNotifier extends Notifier<Null> {
     }
   }
 
-  onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
+  void onPickerSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     final customMonthNotifier = ref.read(customMonthProvider.notifier);
 
     if (args.value is PickerDateRange) {
@@ -86,9 +92,7 @@ class OnChangeNotifier extends Notifier<Null> {
     }
   }
 
-  onOkPressed(
-    BuildContext context,
-  ) {
+  void onCalendarOkPressed(BuildContext context) {
     final customMonth = ref.read(customMonthProvider);
     final dateTimeNotifier = ref.read(dateTimeProvider.notifier);
     final dateFormatNotifier = ref.read(dateFormatProvider.notifier);
@@ -104,6 +108,8 @@ class OnChangeNotifier extends Notifier<Null> {
       dateTimeNotifier.update(
         (state) => ref.read(customMonthProvider),
       );
+
+      ref.read(displayChartsProvider.notifier).addCharts();
     } else {
       ref.read(showErrorProvider.notifier).update((state) => true);
     }

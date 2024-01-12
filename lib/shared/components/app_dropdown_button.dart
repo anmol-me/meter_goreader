@@ -1,8 +1,10 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 
-class CustomDropdownButton extends StatelessWidget {
-  const CustomDropdownButton({
+import '../enums/enums.dart';
+
+class AppDropdownButton extends StatelessWidget {
+  const AppDropdownButton({
     super.key,
     required this.selectedGraphDate,
     required this.onChanged,
@@ -62,26 +64,13 @@ class CustomDropdownButton extends StatelessWidget {
   }
 }
 
-enum ShowDate {
-  thisWeek('This Week'),
-  lastWeek('Last Week'),
-  thisMonth('This Month'),
-  lastMonth('Last Month'),
-  thisYear('This Year'),
-  custom('Custom');
-
-  const ShowDate(this.value);
-
-  final String value;
-}
-
 final dateKeyValues = {
-  'item1': ShowDate.thisWeek,
-  'item2': ShowDate.lastWeek,
-  'item3': ShowDate.thisMonth,
-  'item4': ShowDate.lastMonth,
-  'item5': ShowDate.thisYear,
-  'item6': ShowDate.custom,
+  'item1': DropdownDate.thisWeek,
+  'item2': DropdownDate.lastWeek,
+  'item3': DropdownDate.thisMonth,
+  'item4': DropdownDate.lastMonth,
+  'item5': DropdownDate.thisYear,
+  'item6': DropdownDate.custom,
 };
 
 List<DropdownMenuItem<String>> items = dateKeyValues.entries
