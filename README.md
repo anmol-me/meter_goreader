@@ -1,16 +1,56 @@
-# meter_reader
+<div id="header" align="center">
+  <img src="https://media.giphy.com/media/M9gbBd9nbDrOTu1Mqx/giphy.gif" width="100"/>
+</div>
 
-An app which keep track of meter readings.
+<div id="badges" align="center">
+  <a href="https://www.linkedin.com/in/anmol-singh-2210561a2/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/LinkedIn-blue?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn Badge"/></a>
+  <a href="http://anisingh.com/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/anisingh-.com-blue?style=flat-square&color=blue" alt="website Badge"></a>
+</div>
 
-## Getting Started
+# Meter GoReader
 
-This project is a starting point for a Flutter application.
+Meter GoReader lets you effortlessly track energy consumption. Easily monitor your meter readings
+and visualize your usage trends with intuitive charts, empowering you to make informed decisions and
+save on energy costs.
 
-A few resources to get you started if this is your first Flutter project:
+## Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Energy Consumption Tracking
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Easily monitor energy consumption on a daily basis.
+- Keep track of usage patterns and trends over time.
+
+### Multiple Views
+
+- Access data in weekly, monthly, and yearly formats.
+- Gain insights into energy usage trends over different time periods.
+
+### Efficient Search Functionality
+
+- Quickly retrieve saved meter readings using specific dates.
+- Easily locate historical data to analyze consumption patterns and make informed decisions.
+
+## Steps to build project
+
+1. Clone the Flutter Project:
+    - Use  `git clone https://github.com/me-anmol-dev/meter-goreader.git`  to download the project from the
+      GitHub repository.
+2. Install Dependencies:
+    - Navigate to the project directory and run  `flutter pub get`  to install the required
+      dependencies.
+3. Run the App:
+    - Connect a device or emulator and run the app using  `flutter run`  or through your IDE.
+
+## Report issues
+
+If you encounter any issues with the project or have suggestions for improvements, please don't
+hesitate to report them. To report an issue:
+
+1. Go to the [Issues](https://github.com/me-anmol-dev/meter-goreader/issues) section of this repository.
+2. Click on the "New Issue" button.
+3. Clearly describe the problem you're experiencing or the feature you're requesting.
+4. Provide steps to reproduce the issue if possible.
+5. Add any relevant screenshots or code snippets that can help in understanding the issue.
+6. Click "Submit new issue".
+
+Thank you for helping us improve Meter GoReader!
