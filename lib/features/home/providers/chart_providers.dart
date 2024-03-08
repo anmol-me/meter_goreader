@@ -45,7 +45,7 @@ class ChartNotifier extends Notifier<Null> {
 
     double interval = 10;
     if (chartType == ChartType.isYear) {
-      interval = 50;
+      interval = 100;
     } else if (chartType == ChartType.isMonth) {
       interval = 10;
     } else if (chartType == ChartType.isWeek) {
@@ -65,7 +65,7 @@ class ChartNotifier extends Notifier<Null> {
         sideTitles: SideTitles(
           showTitles: true,
           reservedSize: 37,
-          getTitlesWidget: getYTitles,
+          getTitlesWidget: (val, meta) => getYTitles(val, meta, ref),
           interval: interval,
         ),
       ),

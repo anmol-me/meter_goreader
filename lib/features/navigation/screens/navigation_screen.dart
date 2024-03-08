@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:meter_reader/features/add_new/screens/add_new_screen.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meter_reader/features/home/screens/home_screen.dart';
 import 'package:meter_reader/features/readings/screens/readings_screen.dart';
 
@@ -33,7 +32,6 @@ class NavigationScreen extends ConsumerWidget {
 
 final _bottomNavigationBarItems = [
   const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-  const BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
   const BottomNavigationBarItem(
     icon: Icon(Icons.energy_savings_leaf_outlined),
     label: 'Readings',
@@ -42,6 +40,5 @@ final _bottomNavigationBarItems = [
 
 final _screens = [
   const HomeScreen(),
-  const AddNewScreen(),
   const ReadingsScreen(),
 ];

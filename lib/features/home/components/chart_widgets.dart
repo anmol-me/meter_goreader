@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:meter_reader/features/home/providers/home_providers.dart';
 
 import '../../../shared/enums/enums.dart';
@@ -51,12 +52,23 @@ Widget getXTitles(double val, TitleMeta meta, ref) {
   );
 }
 
-Widget getYTitles(double val, TitleMeta meta) {
+Widget getYTitles(double val, TitleMeta meta, Ref ref) {
   final value = val.toInt();
+
+  final chartType = ref.read(chartTypeProvider);
+
+  double space = 10;
+  if (chartType == ChartType.isYear) {
+    space = 1;
+  } else if (chartType == ChartType.isMonth) {
+    space = 10;
+  } else if (chartType == ChartType.isWeek) {
+    space = 10;
+  }
 
   return SideTitleWidget(
     axisSide: meta.axisSide,
-    space: 12,
+    space: space,
     child: Text(
       value.toString(),
       style: const TextStyle(

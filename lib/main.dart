@@ -21,6 +21,9 @@ class MyApp extends StatelessWidget {
           seedColor: Colors.green,
           background: Colors.white,
         ),
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+        ),
       ),
     );
   }

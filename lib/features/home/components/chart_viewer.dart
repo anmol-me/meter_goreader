@@ -128,7 +128,7 @@ class ChartViewerForYear extends BaseChartViewer {
                 ),
                 gridData: const FlGridData(show: false),
                 alignment: BarChartAlignment.spaceAround,
-                maxY: 300,
+                maxY: 1200,
               ),
             ),
           ),
